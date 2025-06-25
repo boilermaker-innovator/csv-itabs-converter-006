@@ -1,0 +1,1377 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to iTabs Converter - Alliance AMS Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px 30px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .section-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .conversion-flow {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .csv-section, .output-section {
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .csv-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px dashed #6c757d;
+        }
+        
+        .csv-section:hover {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        }
+        
+        .csv-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .csv-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .csv-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .csv-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .csv-btn.active {
+            background: #28a745;
+        }
+        
+        .csv-data {
+            background: #fff;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            transition: all 0.3s ease;
+            line-height: 1.4;
+        }
+        
+        .csv-data[contenteditable="true"] {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+        }
+        
+        .editable-hint {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 12px;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        .conversion-controls {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .convert-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            position: relative;
+        }
+        
+        .convert-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        
+        .convert-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+        
+        .output-section {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f0fff4 100%);
+            border: 2px solid #28a745;
+            min-height: 200px;
+        }
+        
+        .output-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #155724;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .loading-state {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+        
+        .processing-steps {
+            text-align: left;
+            margin-top: 20px;
+        }
+        
+        .processing-step {
+            padding: 8px 0;
+            color: #666;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .processing-step.active {
+            color: #28a745;
+            opacity: 1;
+            font-weight: 600;
+        }
+        
+        .processing-step.completed {
+            color: #155724;
+            opacity: 0.8;
+        }
+        
+        .processing-step.completed::before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .product-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .product-preview.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+            animation: slideIn 0.5s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .product-preview:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+            border-color: #28a745;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            flex-wrap: wrap;
+        }
+        
+        .product-details {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .itabs-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-style: italic;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
+        }
+        
+        .itabs-indicator:hover {
+            transform: scale(1.15);
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.4);
+        }
+        
+        .success-message {
+            text-align: center;
+            color: #155724;
+            font-weight: 600;
+            padding: 20px;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #c3e6cb;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .error-message {
+            text-align: center;
+            color: #721c24;
+            font-weight: 600;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-radius: 12px;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .conversion-flow {
+                padding: 20px;
+            }
+            
+            .csv-section, .output-section {
+                padding: 20px;
+            }
+            
+            .csv-title {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .csv-controls {
+                justify-content: center;
+            }
+            
+            .csv-data {
+                font-size: 12px;
+                padding: 15px;
+                min-height: 150px;
+            }
+            
+            .convert-btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+            
+            .product-name {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .itabs-indicator {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CSV to iTabs Converter</h1>
+        <p>Transform your product data into interactive customer experiences</p>
+    </div>
+
+    <div class="container">
+        <div class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">Live Conversion Demo</h2>
+                <p class="section-subtitle">Watch your raw CSV data transform into interactive iTabs</p>
+            </div>
+            
+            <div class="conversion-flow">
+                <!-- CSV Input Section -->
+                <div class="csv-section">
+                    <div class="csv-title">
+                        📄 Your CSV Product Data
+                        <div class="csv-controls">
+                            <button class="csv-btn" onclick="toggleEditing(this)">Edit</button>
+                            <button class="csv-btn" onclick="clearCSV()">Clear</button>
+                            <button class="csv-btn" onclick="loadSample('automotive')">Auto Parts</button>
+                            <button class="csv-btn" onclick="loadSample('tools')">Tools</button>
+                            <button class="csv-btn" onclick="loadSample('electronics')">Electronics</button>
+                        </div>
+                    </div>
+                    <div class="csv-data" id="csvData" contenteditable="false">product_code,product_name,price,material,size,stock_status,brand
+NWP-B4C,Premium Ceramic Brake Pads,89.95,Ceramic Compound,Front Set,In Stock,NAPA
+RDA-7945,Disc Brake Rotor Set,245.00,Cast Iron,280mm Vented,In Stock,RDA
+GATES-5PK1190,Serpentine Drive Belt,42.50,EPDM Rubber,1190mm Length,In Stock,Gates
+WIX-51515,Engine Air Filter,18.95,Paper Element,Round 203mm,In Stock,WIX
+FRAM-PH3593A,Oil Filter Cartridge,24.95,Cellulose Media,3/4-16 Thread,In Stock,FRAM</div>
+                    <div class="editable-hint">Click "Edit" to modify data, or use sample buttons to try different categories</div>
+                </div>
+
+                <!-- Conversion Controls -->
+                <div class="conversion-controls">
+                    <button class="convert-btn" id="convertBtn" onclick="startConversion()">
+                        Convert to iTabs
+                        <span class="ai-badge">AI Enhanced</span>
+                    </button>
+                </div>
+                
+                <!-- Output Section -->
+                <div class="output-section">
+                    <div class="output-title">🎯 Interactive iTabs Products</div>
+                    <div id="outputArea">
+                        <div class="loading-state">
+                            <div style="font-size: 2.5rem; margin-bottom: 15px;">⚡</div>
+                            <div style="font-weight: 600; margin-bottom: 10px;">Ready to Transform</div>
+                            <div>Click "Convert to iTabs" to see your data come alive</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for different product categories
+        const sampleCSVData = {
+            automotive: `product_code,product_name,price,material,size,stock_status,brand
+NWP-B4C,Premium Ceramic Brake Pads,89.95,Ceramic Compound,Front Set,In Stock,NAPA
+RDA-7945,Disc Brake Rotor Set,245.00,Cast Iron,280mm Vented,In Stock,RDA
+GATES-5PK1190,Serpentine Drive Belt,42.50,EPDM Rubber,1190mm Length,In Stock,Gates
+WIX-51515,Engine Air Filter,18.95,Paper Element,Round 203mm,In Stock,WIX
+FRAM-PH3593A,Oil Filter Cartridge,24.95,Cellulose Media,3/4-16 Thread,In Stock,FRAM
+NGK-4424,Iridium Spark Plug,16.95,Iridium Electrode,14mm Thread,In Stock,NGK
+MONROE-58640,Shock Absorber,78.50,Steel/Rubber,Front Left,In Stock,Monroe`,
+
+            tools: `product_code,product_name,price,material,size,stock_status,brand
+F-6MM,Forstner Bit 6mm,18.95,High Speed Steel,6mm,In Stock,Alliance Tools
+F-10MM,Forstner Bit 10mm,22.95,High Speed Steel,10mm,In Stock,Alliance Tools
+F-15MM,Forstner Bit 15mm,28.95,High Speed Steel,15mm,In Stock,Alliance Tools
+D-12MM,HSS Drill Bit 12mm,8.95,High Speed Steel,12mm,In Stock,Alliance Tools
+D-15MM,HSS Drill Bit 15mm,12.95,High Speed Steel,15mm,In Stock,Alliance Tools
+S-150MM,Steel Rule 150mm,15.50,Stainless Steel,150mm,In Stock,Alliance Tools
+H-450G,Claw Hammer,24.95,Steel Head/Fibreglass,450g,In Stock,Alliance Tools`,
+
+            electronics: `product_code,product_name,price,material,size,stock_status,brand
+LED-5W-WW,LED Bulb 5W Warm White,12.95,Aluminum/Plastic,E27 Base,In Stock,Philips
+USB-C-3M,USB-C Cable 3M,24.95,Copper/TPE,3 Meter,In Stock,Anker
+PWR-65W-GAN,GaN Charger 65W,89.95,Gallium Nitride,Compact,In Stock,Anker
+SSD-1TB-NVMe,NVMe SSD 1TB,159.95,3D NAND Flash,M.2 2280,In Stock,Samsung
+RAM-16GB-DDR4,DDR4 RAM 16GB,89.95,Silicon,3200MHz,In Stock,Corsair
+KB-MECH-RGB,Mechanical Keyboard RGB,179.95,Aluminum/Switches,Full Size,In Stock,Corsair
+MOU-WIRELESS,Wireless Gaming Mouse,69.95,Plastic/Sensors,Ergonomic,In Stock,Logitech`
+        };
+
+        let productDatabase = [];
+        let isConverting = false;
+
+        // Core CSV parsing function
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const products = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                if (values.length >= headers.length && values.some(v => v)) {
+                    const product = {};
+                    headers.forEach((header, index) => {
+                        product[header] = values[index] || '';
+                    });
+                    products.push(product);
+                }
+            }
+            
+            return products;
+        }
+
+        // CSV editing functionality
+        function toggleEditing(button) {
+            const csvData = document.getElementById('csvData');
+            
+            if (csvData.contentEditable === 'false') {
+                csvData.contentEditable = 'true';
+                csvData.focus();
+                button.textContent = 'Save';
+                button.classList.add('active');
+            } else {
+                csvData.contentEditable = 'false';
+                button.textContent = 'Edit';
+                button.classList.remove('active');
+            }
+        }
+        
+        function clearCSV() {
+            document.getElementById('csvData').textContent = 'product_code,product_name,price,material,size,stock_status,brand\n\n';
+            resetOutput();
+        }
+        
+        function loadSample(type) {
+            document.getElementById('csvData').textContent = sampleCSVData[type];
+            resetOutput();
+        }
+        
+        function resetOutput() {
+            document.getElementById('outputArea').innerHTML = `
+                <div class="loading-state">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">⚡</div>
+                    <div style="font-weight: 600; margin-bottom: 10px;">Ready to Transform</div>
+                    <div>Click "Convert to iTabs" to see your data come alive</div>
+                </div>
+            `;
+        }
+
+        // Main conversion function
+        function startConversion() {
+            if (isConverting) return;
+            
+            const csvText = document.getElementById('csvData').textContent;
+            const outputArea = document.getElementById('outputArea');
+            const convertBtn = document.getElementById('convertBtn');
+            
+            // Validate CSV data
+            const products = parseCSV(csvText);
+            if (products.length === 0) {
+                outputArea.innerHTML = `
+                    <div class="error-message">
+                        ❌ No valid product data found. Please check your CSV format and try again.
+                    </div>
+                `;
+                return;
+            }
+            
+            isConverting = true;
+            convertBtn.disabled = true;
+            productDatabase = products;
+            
+            // Show loading animation
+            outputArea.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div style="font-weight: 600; margin-bottom: 15px;">Converting CSV to iTabs...</div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                    <div class="processing-steps">
+                        <div class="processing-step" id="step1">📊 Parsing CSV data...</div>
+                        <div class="processing-step" id="step2">🤖 AI enhancing product descriptions...</div>
+                        <div class="processing-step" id="step3">🎯 Creating interactive iTabs...</div>
+                        <div class="processing-step" id="step4">✨ Finalizing customer experience...</div>
+                    </div>
+                </div>
+            `;
+            
+            // Simulate processing steps
+            simulateProcessing();
+        }
+
+        function simulateProcessing() {
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            const progressFill = document.getElementById('progressFill');
+            let currentStep = 0;
+            
+            function processStep() {
+                if (currentStep > 0) {
+                    document.getElementById(steps[currentStep - 1]).classList.remove('active');
+                    document.getElementById(steps[currentStep - 1]).classList.add('completed');
+                }
+                
+                if (currentStep < steps.length) {
+                    document.getElementById(steps[currentStep]).classList.add('active');
+                    progressFill.style.width = `${((currentStep + 1) / steps.length) * 100}%`;
+                    currentStep++;
+                    setTimeout(processStep, 1000);
+                } else {
+                    // Processing complete, show results
+                    setTimeout(showResults, 500);
+                }
+            }
+            
+            processStep();
+        }
+
+        function showResults() {
+            const outputArea = document.getElementById('outputArea');
+            const convertBtn = document.getElementById('convertBtn');
+            
+            let html = '';
+            
+            productDatabase.forEach((product, index) => {
+                const name = product.product_name || product.name || `Product ${index + 1}`;
+                const code = product.product_code || product.code || `P${index + 1}`;
+                const price = product.price || '0.00';
+                const brand = product.brand || 'Unknown Brand';
+                const stock = product.stock_status || product.status || 'Unknown';
+                
+                html += `
+                    <div class="product-preview" style="animation-delay: ${index * 0.1}s">
+                        <div class="product-name">
+                            ${name}
+                            <span class="itabs-indicator" onclick="showProductPopup('${code}')">i</span>
+                        </div>
+                        <div class="product-details">
+                            <strong>Code:</strong> ${code} • <strong>Price:</strong> $${price} • <strong>Brand:</strong> ${brand} • <strong>Status:</strong> ${stock}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="success-message">
+                    🎉 <strong>Conversion Complete!</strong><br>
+                    Click any blue "i" button to see the interactive iTabs in action!
+                </div>
+            `;
+            
+            outputArea.innerHTML = html;
+            
+            // Animate products in
+            setTimeout(() => {
+                const previews = document.querySelectorAll('.product-preview');
+                previews.forEach(preview => {
+                    preview.classList.add('animate-in');
+                });
+            }, 100);
+            
+            isConverting = false;
+            convertBtn.disabled = false;
+        }
+
+        // Placeholder for popup function (Part 2 will add this)
+        function showProductPopup(productCode) {
+            alert(`Part 1 Complete! Product: ${productCode}\n\nPart 2 will add the full popup system with working iTabs functionality.`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('CSV to iTabs Converter Part 1 - Complete and Working!');
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!-- Add this CSS to your existing <style> section -->
+<style>
+/* Add these styles to your existing CSS */
+
+/* iTabs Popup System */
+.itabs-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.itabs-overlay.active {
+    display: flex;
+    animation: fadeInOverlay 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.itabs-popup {
+    background: white;
+    width: 90vw;
+    max-width: 600px;
+    max-height: 85vh;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideInPopup 0.4s ease;
+    position: relative;
+}
+
+@keyframes slideInPopup {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(-20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+.popup-header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 25px;
+    position: relative;
+}
+
+.popup-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 40px 0 0;
+    line-height: 1.3;
+}
+
+.popup-product-code {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 8px;
+    font-family: 'Courier New', monospace;
+}
+
+.popup-close {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.popup-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.popup-tabs {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    overflow-x: auto;
+}
+
+.popup-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 15px 12px;
+    background: none;
+    border: none;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    text-align: center;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.popup-tab:hover {
+    color: #2a5298;
+    background: rgba(42, 82, 152, 0.05);
+}
+
+.popup-tab.active {
+    color: #2a5298;
+    background: white;
+    border-bottom-color: #2a5298;
+    font-weight: 700;
+}
+
+.popup-content {
+    padding: 25px;
+    max-height: 400px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeInContent 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeInContent {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-content h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.tab-content p {
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+.spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.spec-table th,
+.spec-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.spec-table th {
+    background: #e9ecef;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.spec-table tr:last-child td {
+    border-bottom: none;
+}
+
+.price-highlight {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    margin: 15px 0;
+    border: 1px solid #c3e6cb;
+}
+
+.price-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #155724;
+    margin-bottom: 5px;
+}
+
+.price-label {
+    color: #155724;
+    font-weight: 500;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.feature-list li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+    color: #495057;
+}
+
+.feature-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #28a745;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.highlight-box {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-left: 4px solid #2a5298;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.highlight-box h5 {
+    color: #1565c0;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.ai-enhanced-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+/* Mobile Responsive for Popup */
+@media (max-width: 768px) {
+    .itabs-popup {
+        width: 95vw;
+        max-height: 90vh;
+    }
+    
+    .popup-content {
+        padding: 20px;
+        max-height: 350px;
+    }
+    
+    .popup-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+    
+    .popup-tab {
+        font-size: 12px;
+        padding: 12px 8px;
+        min-width: 70px;
+    }
+    
+    .popup-title {
+        font-size: 1.2rem;
+    }
+    
+    .price-amount {
+        font-size: 1.6rem;
+    }
+}
+</style>
+
+<!-- Add this HTML right before your closing </body> tag -->
+<div class="itabs-overlay" id="itabsOverlay" onclick="closePopup()">
+    <div class="itabs-popup" onclick="event.stopPropagation()">
+        <div class="popup-header">
+            <h3 class="popup-title" id="popupTitle">Product Information</h3>
+            <div class="popup-product-code" id="popupProductCode">Code: XXX-XXX</div>
+            <button class="popup-close" onclick="closePopup()">&times;</button>
+        </div>
+        
+        <div class="popup-tabs">
+            <button class="popup-tab active" onclick="switchTab(this, 'overview')">Overview</button>
+            <button class="popup-tab" onclick="switchTab(this, 'specifications')">Specifications</button>
+            <button class="popup-tab" onclick="switchTab(this, 'pricing')">Pricing</button>
+            <button class="popup-tab" onclick="switchTab(this, 'features')">Features</button>
+            <button class="popup-tab" onclick="switchTab(this, 'applications')">Applications</button>
+        </div>
+        
+        <div class="popup-content">
+            <div class="tab-content active" id="overview">
+                <div id="overviewContent"></div>
+            </div>
+            
+            <div class="tab-content" id="specifications">
+                <div id="specificationsContent"></div>
+            </div>
+            
+            <div class="tab-content" id="pricing">
+                <div id="pricingContent"></div>
+            </div>
+            
+            <div class="tab-content" id="features">
+                <div id="featuresContent"></div>
+            </div>
+            
+            <div class="tab-content" id="applications">
+                <div id="applicationsContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Part 2: Complete Popup System JavaScript
+// Add this to your existing script section
+
+// Enhanced product data with AI-generated content
+const enhancedProductData = {
+    // Automotive category enhancements
+    'NWP-B4C': {
+        category: 'automotive',
+        aiEnhanced: {
+            overview: "Premium ceramic brake pads engineered for superior stopping power and reduced brake dust. These pads deliver consistent performance across a wide temperature range, making them ideal for both daily driving and demanding conditions.",
+            features: [
+                "Low-dust ceramic compound reduces wheel cleaning",
+                "Superior stopping power in all weather conditions", 
+                "Quiet operation with minimal brake noise",
+                "Extended pad life up to 40% longer than standard pads",
+                "Temperature resistant up to 650°C"
+            ],
+            applications: "Perfect for: Daily commuting, Highway driving, Light towing, Urban stop-and-go traffic. Compatible with most passenger vehicles and light trucks.",
+            compatibility: "Fits 2015+ Toyota Hilux, 2016+ Ford Ranger, 2018+ Isuzu D-Max (Front axle)"
+        }
+    },
+    'RDA-7945': {
+        category: 'automotive',
+        aiEnhanced: {
+            overview: "High-performance disc brake rotors featuring advanced metallurgy and precision machining. These rotors provide excellent heat dissipation and consistent braking performance for demanding applications.",
+            features: [
+                "Vented design for superior heat dissipation",
+                "Precision-balanced for smooth operation",
+                "Corrosion-resistant coating",
+                "Direct OE replacement fitment",
+                "Meets Australian Design Rules (ADR)"
+            ],
+            applications: "Suitable for: Performance driving, Heavy-duty applications, Commercial vehicles, Towing applications",
+            compatibility: "Direct replacement for Toyota Hilux 2015+, Ford Ranger 2016+, Mazda BT-50 2020+"
+        }
+    },
+    'GATES-5PK1190': {
+        category: 'automotive',
+        aiEnhanced: {
+            overview: "Heavy-duty serpentine belt engineered for extended service life and reliable power transmission. Features advanced EPDM rubber compound that resists cracking and stretching.",
+            features: [
+                "Advanced EPDM rubber construction",
+                "Oil and heat resistant up to 150°C",
+                "Precise fit with OE-grade tensile cords",
+                "Reduced noise and vibration",
+                "Extended service intervals"
+            ],
+            applications: "Powers: Alternator, Water pump, Power steering, Air conditioning compressor, Engine cooling fan",
+            compatibility: "Fits multiple engine configurations - check vehicle compatibility chart"
+        }
+    },
+
+    // Tools category enhancements  
+    'F-6MM': {
+        category: 'tools',
+        aiEnhanced: {
+            overview: "Precision-ground Forstner bit designed for clean, flat-bottomed holes in wood. Features ultra-sharp cutting edges and optimized geometry for professional results.",
+            features: [
+                "Ultra-sharp cutting edges for clean entry",
+                "Flat-bottomed holes with smooth sides",
+                "Center point prevents wandering",
+                "Suitable for drill press and hand drills",
+                "Professional-grade HSS construction"
+            ],
+            applications: "Perfect for: Dowel holes, Hardware installation, Overlapping holes, Hinge mounting, Professional woodworking",
+            compatibility: "Standard 1/4\" hex shank fits most drill chucks and drill presses"
+        }
+    },
+    'H-450G': {
+        category: 'tools',
+        aiEnhanced: {
+            overview: "Professional-grade claw hammer with balanced design and shock-absorbing handle. Engineered for comfort during extended use and maximum striking efficiency.",
+            features: [
+                "Forged steel head for durability",
+                "Shock-absorbing fiberglass handle",
+                "Anti-slip grip texture",
+                "Precision-balanced for accuracy",
+                "Claw designed for nail removal"
+            ],
+            applications: "Ideal for: General construction, Home improvement, Professional carpentry, Demolition work, Nail driving and removal",
+            compatibility: "Universal tool suitable for all skill levels and applications"
+        }
+    },
+
+    // Electronics category enhancements
+    'LED-5W-WW': {
+        category: 'electronics',
+        aiEnhanced: {
+            overview: "Energy-efficient LED bulb delivering warm white light equivalent to a 40W incandescent. Features advanced LED technology for long life and consistent color temperature.",
+            features: [
+                "Energy savings up to 80% vs incandescent",
+                "25,000+ hour lifespan",
+                "Instant-on warm white light (3000K)",
+                "Dimmable with compatible switches",
+                "Mercury-free construction"
+            ],
+            applications: "Perfect for: Living rooms, Bedrooms, Dining areas, Table lamps, General lighting, Mood lighting",
+            compatibility: "Standard E27 screw base fits most household light fixtures"
+        }
+    },
+    'USB-C-3M': {
+        category: 'electronics',
+        aiEnhanced: {
+            overview: "High-quality USB-C cable with reinforced connectors and premium materials. Supports fast charging and high-speed data transfer for modern devices.",
+            features: [
+                "USB 3.1 Gen 2 data transfer speeds",
+                "100W power delivery support",
+                "Reinforced connector design",
+                "Tangle-resistant TPE jacket",
+                "Universal USB-C compatibility"
+            ],
+            applications: "Compatible with: Smartphones, Tablets, Laptops, Gaming devices, Power banks, USB-C accessories",
+            compatibility: "Works with all USB-C devices including MacBook, iPad Pro, Android phones, Nintendo Switch"
+        }
+    }
+};
+
+// Enhanced showProductPopup function
+function showProductPopup(productCode) {
+    const product = productDatabase.find(p => (p.product_code || p.code) === productCode);
+    
+    if (!product) {
+        console.error('Product not found:', productCode);
+        return;
+    }
+    
+    const name = product.product_name || product.name || 'Product';
+    const code = product.product_code || product.code || productCode;
+    const price = product.price || '0.00';
+    const material = product.material || 'Not specified';
+    const size = product.size || 'Standard';
+    const stock = product.stock_status || product.status || 'Unknown';
+    const brand = product.brand || 'Unknown Brand';
+    
+    // Get AI-enhanced data
+    const enhanced = enhancedProductData[code] || generateGenericEnhancement(product);
+    
+    // Update popup header
+    document.getElementById('popupTitle').textContent = name;
+    document.getElementById('popupProductCode').textContent = `Code: ${code}`;
+    
+    // Populate Overview tab
+    document.getElementById('overviewContent').innerHTML = `
+        <h4>${name} <span class="ai-enhanced-badge">AI Enhanced</span></h4>
+        <p>${enhanced.aiEnhanced.overview}</p>
+        
+        <div class="highlight-box">
+            <h5>Key Product Information</h5>
+            <p><strong>Brand:</strong> ${brand}<br>
+            <strong>Material:</strong> ${material}<br>
+            <strong>Size/Specification:</strong> ${size}<br>
+            <strong>Stock Status:</strong> <span style="color: #28a745; font-weight: bold;">${stock}</span></p>
+        </div>
+        
+        ${enhanced.aiEnhanced.compatibility ? `
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #ffeaa7;">
+            <strong>🔧 Compatibility:</strong><br>
+            ${enhanced.aiEnhanced.compatibility}
+        </div>
+        ` : ''}
+    `;
+    
+    // Populate Specifications tab
+    document.getElementById('specificationsContent').innerHTML = `
+        <h4>Technical Specifications</h4>
+        <table class="spec-table">
+            <tr><th>Product Code</th><td>${code}</td></tr>
+            <tr><th>Brand</th><td>${brand}</td></tr>
+            <tr><th>Material</th><td>${material}</td></tr>
+            <tr><th>Size/Specification</th><td>${size}</td></tr>
+            <tr><th>Category</th><td>${enhanced.category.charAt(0).toUpperCase() + enhanced.category.slice(1)}</td></tr>
+            <tr><th>Stock Status</th><td><span style="color: #28a745; font-weight: bold;">${stock}</span></td></tr>
+            <tr><th>Warranty</th><td>12 months manufacturer warranty</td></tr>
+        </table>
+    `;
+    
+    // Populate Pricing tab
+    document.getElementById('pricingContent').innerHTML = `
+        <div class="price-highlight">
+            <div class="price-amount">$${price}</div>
+            <div class="price-label">Alliance AMS Price</div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <h5>Pricing Information</h5>
+            <p><strong>Retail Price:</strong> $${price}</p>
+            <p><strong>Trade Discount:</strong> Available for account holders</p>
+            <p><strong>Bulk Pricing:</strong> Contact for quantity discounts</p>
+            <p><strong>Payment Terms:</strong> Net 30 days for approved accounts</p>
+        </div>
+        
+        <div style="background: #d4edda; padding: 15px; border-radius: 8px; border: 1px solid #c3e6cb;">
+            <strong>🚚 Delivery Options:</strong><br>
+            • Perth Metro: Same day delivery<br>
+            • WA Regional: Next business day<br>
+            • Interstate: 2-3 business days<br>
+            • Free delivery on orders over $150
+        </div>
+    `;
+    
+    // Populate Features tab
+    document.getElementById('featuresContent').innerHTML = `
+        <h4>Key Features & Benefits</h4>
+        <ul class="feature-list">
+            ${enhanced.aiEnhanced.features.map(feature => `<li>${feature}</li>`).join('')}
+        </ul>
+        
+        <div class="highlight-box">
+            <h5>Why Choose This Product?</h5>
+            <p>This product represents excellent value with proven reliability and performance. Our customers consistently rate ${brand} products highly for quality and durability.</p>
+        </div>
+    `;
+    
+    // Populate Applications tab
+    document.getElementById('applicationsContent').innerHTML = `
+        <h4>Applications & Use Cases</h4>
+        <p>${enhanced.aiEnhanced.applications}</p>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h5>Installation & Usage Tips</h5>
+            <p>For optimal performance and longevity, follow manufacturer guidelines for installation and maintenance. Professional installation recommended for critical applications.</p>
+        </div>
+        
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border: 1px solid #b3d7ff;">
+            <strong>📞 Need Help?</strong><br>
+            Our technical team is available to assist with product selection, compatibility questions, and installation guidance.<br>
+            <strong>Phone:</strong> (08) 9455-1234 | <strong>Email:</strong> support@allianceams.com.au
+        </div>
+    `;
+    
+    // Show popup
+    document.getElementById('itabsOverlay').classList.add('active');
+    
+    // Reset to first tab
+    switchTab(document.querySelector('.popup-tab'), 'overview');
+}
+
+// Generate enhanced content for products not in our database
+function generateGenericEnhancement(product) {
+    const category = detectCategory(product);
+    
+    return {
+        category: category,
+        aiEnhanced: {
+            overview: `Professional-grade ${product.product_name || 'product'} designed for reliable performance and long service life. Manufactured to high standards with quality materials and precision engineering.`,
+            features: [
+                "High-quality construction materials",
+                "Precision manufacturing for reliable fit",
+                "Tested for durability and performance",
+                "Suitable for professional applications",
+                "Backed by manufacturer warranty"
+            ],
+            applications: `Suitable for various ${category} applications where quality and reliability are essential.`,
+            compatibility: "Check with technical support for specific compatibility requirements"
+        }
+    };
+}
+
+// Detect product category based on name/code
+function detectCategory(product) {
+    const name = (product.product_name || '').toLowerCase();
+    const code = (product.product_code || '').toLowerCase();
+    
+    if (name.includes('brake') || name.includes('rotor') || name.includes('filter') || name.includes('belt') || name.includes('spark')) {
+        return 'automotive';
+    } else if (name.includes('bit') || name.includes('drill') || name.includes('hammer') || name.includes('tool')) {
+        return 'tools';
+    } else if (name.includes('led') || name.includes('usb') || name.includes('cable') || name.includes('electronic')) {
+        return 'electronics';
+    }
+    return 'general';
+}
+
+// Tab switching functionality
+function switchTab(tabElement, tabName) {
+    // Remove active class from all tabs and contents
+    document.querySelectorAll('.popup-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab and corresponding content
+    tabElement.classList.add('active');
+    document.getElementById(tabName).classList.add('active');
+}
+
+// Close popup functionality
+function closePopup() {
+    document.getElementById('itabsOverlay').classList.remove('active');
+}
+
+// Keyboard support
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closePopup();
+    }
+});
+
+console.log('CSV to iTabs Converter - Part 2 Complete! Full popup system active.');
+</script>
+
+
