@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alliance AMS iTabs Test - Jon's Demo</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+            padding: 20px; 
+            line-height: 1.6; 
+            background: #f5f7fa;
+            margin: 0;
+        }
+
+```
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .test-section { 
+        background: #f8f9fa; 
+        padding: 25px; 
+        margin: 25px 0; 
+        border-radius: 8px; 
+        border: 1px solid #e9ecef;
+    }
+    
+    h1 { 
+        color: #0066CC; 
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+    }
+    
+    h2 { 
+        color: #2c3e50; 
+        margin-bottom: 15px;
+        border-bottom: 2px solid #0066CC;
+        padding-bottom: 8px;
+    }
+    
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+    }
+    
+    .product-table th,
+    .product-table td {
+        border: 1px solid #dee2e6;
+        padding: 12px;
+        text-align: left;
+    }
+    
+    .product-table th {
+        background: #0066CC;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .product-table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+    
+    .status-box {
+        background: #e8f4fd;
+        border: 2px solid #0066CC;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+        text-align: center;
+    }
+    
+    .instructions {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .success-indicator {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 20px 0;
+        font-weight: 600;
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <h1>Alliance AMS iTabs Test</h1>
+        <div class="subtitle">Jon's Live Demo - Testing Before Showing Gavin</div>
+
+```
+    <div class="status-box">
+        <h3>🎯 What to Look For</h3>
+        <p>Blue "i" buttons should appear next to every product code below. Click them to see detailed product information popups.</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>📋 Product Catalog Examples</h2>
+        <p>Alliance AMS stocks premium <strong>NWP-B4C</strong> ceramic brake pads for superior stopping power at $89.95 per set.</p>
+        
+        <p>We also carry high-performance <strong>RDA-7945</strong> slotted brake rotors designed for heavy-duty applications.</p>
+        
+        <p>Essential maintenance items include <strong>NAPA-F45</strong> oil filters for diesel engines and <strong>GATES-5PK1190</strong> serpentine belts.</p>
+        
+        <p>Performance upgrades available with <strong>NGK-4424</strong> iridium spark plugs for enhanced ignition.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Product Pricing Table</h2>
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Product Code</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>NWP-B4C</strong></td>
+                    <td>NAPA Ceramic Brake Pads</td>
+                    <td>Brake System</td>
+                    <td>$89.95</td>
+                    <td>In Stock</td>
+                </tr>
+                <tr>
+                    <td><strong>RDA-7945</strong></td>
+                    <td>RDA Brake Rotors - Front Pair</td>
+                    <td>Brake System</td>
+                    <td>$245.00</td>
+                    <td>In Stock</td>
+                </tr>
+                <tr>
+                    <td><strong>NAPA-F45</strong></td>
+                    <td>NAPA Oil Filter - Spin-On</td>
+                    <td>Engine</td>
+                    <td>$24.95</td>
+                    <td>In Stock</td>
+                </tr>
+                <tr>
+                    <td><strong>GATES-5PK1190</strong></td>
+                    <td>Gates Serpentine Belt</td>
+                    <td>Engine</td>
+                    <td>$42.50</td>
+                    <td>In Stock</td>
+                </tr>
+                <tr>
+                    <td><strong>NGK-4424</strong></td>
+                    <td>NGK Iridium Spark Plug</td>
+                    <td>Ignition</td>
+                    <td>$16.95</td>
+                    <td>In Stock</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Technical Product Descriptions</h2>
+        <p>The <strong>NWP-B4C</strong> brake pad set features advanced ceramic compound technology, providing 60% less brake dust compared to standard semi-metallic pads. Perfect for 2018+ Toyota Hilux and Ford Ranger applications.</p>
+        
+        <p>Our <strong>RDA-7945</strong> rotors utilize precision-machined slotting patterns for enhanced heat dissipation and improved pad bite. Ideal for commercial vehicle applications requiring consistent braking performance.</p>
+        
+        <p>Professional installers recommend the <strong>NAPA-F45</strong> filter for 2015+ Toyota Hilux 2.8L diesel engines, featuring 99% filtration efficiency and extended service intervals up to 15,000km.</p>
+    </div>
+
+    <div class="instructions">
+        <h3>🧪 Testing Instructions for Jon:</h3>
+        <ol>
+            <li><strong>Look for blue "i" buttons</strong> next to each product code above</li>
+            <li><strong>Click any "i" button</strong> to see the product information popup</li>
+            <li><strong>Try all 4 tabs</strong> in the popup: Overview, Specifications, Pricing, Applications</li>
+            <li><strong>Test on mobile</strong> - open this page on your phone and try the popups</li>
+            <li><strong>Check responsiveness</strong> - resize your browser window to see mobile adaptation</li>
+        </ol>
+    </div>
+
+    <div class="success-indicator" id="successMessage" style="display: none;">
+        ✅ iTabs is working! You should see blue "i" buttons next to all product codes.
+    </div>
+</div>
+
+<!-- Alliance AMS iTabs System -->
+<script src="itabs-database.js"></script>
+<script src="itabs-scanner.js"></script>
+<script src="itabs-popup.js"></script>
+
+<!-- Show success message when iTabs loads -->
+<script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            if (window.iTabs && window.iTabs.productDatabase) {
+                document.getElementById('successMessage').style.display = 'block';
+            }
+        }, 2000);
+    });
+</script>
+```
+
+</body>
+</html>
